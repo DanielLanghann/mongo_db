@@ -13,8 +13,8 @@ This guide demonstrates how to run MongoDB in a Docker container using Docker Co
 ### 1. Clone the Repository
 
 ```bash
-git clone [repository-url]
-cd [repository-name]
+git clone [[repository-url](https://github.com/DanielLanghann/mongo_db.git)]
+cd [path_to_repository]
 ```
 
 ### 2. Start MongoDB Container
