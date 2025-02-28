@@ -1,200 +1,91 @@
 # MongoDB Docker Setup
 
-This guide demonstrates how to set up MongoDB in a Docker container using Docker Compose and connect to it using MongoDB Compass.
+This guide demonstrates how to run MongoDB in a Docker container using Docker Compose and connect to it using MongoDB Compass.
 
 ## Prerequisites
 
 - [Docker](https://docs.docker.com/get-docker/)
 - [Docker Compose](https://docs.docker.com/compose/install/)
-- [MongoDB Compass](https://www.mongodb.com/products/compass) (GUI client for MongoDB)
+- [MongoDB Compass](https://www.mongodb.com/products/compass) (optional, for GUI access)
 
-## Setting Up MongoDB with Docker Compose
+## Quick Start
 
-### 1. Create Project Directory
+### 1. Clone the Repository
 
 ```bash
-mkdir mongodb-docker
-cd mongodb-docker
+git clone [repository-url]
+cd [repository-name]
 ```
 
-### 2. Create Docker Compose Configuration
-
-Create a file named `docker-compose.yml` with the following content:
-
-```yaml
-version: '3.8'
-
-services:
-  mongodb:
-    image: mongo:latest
-    container_name: mongodb
-    restart: always
-    environment:
-      - MONGO_INITDB_ROOT_USERNAME=admin
-      - MONGO_INITDB_ROOT_PASSWORD=password
-      - MONGO_INITDB_DATABASE=mydatabase
-    ports:
-      - 27017:27017
-    volumes:
-      - mongodb_data:/data/db
-    networks:
-      - mongo_network
-
-networks:
-  mongo_network:
-    driver: bridge
-
-volumes:
-  mongodb_data:
-    driver: local
-```
-
-### 3. Start MongoDB Container
-
-Run the following command to start MongoDB in detached mode:
+### 2. Start MongoDB Container
 
 ```bash
 docker compose up -d
 ```
 
-### 4. Verify Container Status
+This command starts MongoDB in detached mode using the provided docker-compose.yml configuration.
 
-Ensure the container is running correctly:
+### 3. Verify Container Status
 
 ```bash
 docker ps
 ```
 
-You should see output similar to:
+You should see the MongoDB container running.
 
-```
-CONTAINER ID   IMAGE          COMMAND                  CREATED         STATUS         PORTS                      NAMES
-a1b2c3d4e5f6   mongo:latest   "docker-entrypoint.s…"   1 minute ago    Up 1 minute    0.0.0.0:27017->27017/tcp   mongodb
-```
+## Connecting to MongoDB
 
-## Connecting with MongoDB Compass
+### Using MongoDB Compass
 
-### 1. Install MongoDB Compass
+1. Download and install MongoDB Compass from the [official website](https://www.mongodb.com/products/compass) if you haven't already
 
-Download and install MongoDB Compass from the [official website](https://www.mongodb.com/products/compass).
+2. Open MongoDB Compass
 
-### 2. Connect to MongoDB
+3. On the connection screen, you can connect using either:
 
-1. Open MongoDB Compass
-2. In the connection string field, enter:
-   ```
-   mongodb://admin:password@localhost:27017/mydatabase?authSource=admin
-   ```
-3. Click the "Connect" button
+   **Option 1: Connection string**
+   - Enter the following connection string:
+     ```
+     mongodb://admin:password@localhost:27017/mydatabase?authSource=admin
+     ```
 
-### 3. Connection String Breakdown
+   **Option 2: Form fields**
+   - Hostname: `localhost`
+   - Port: `27017`
+   - Authentication: Username/Password
+   - Username: `admin`
+   - Password: `password`
+   - Authentication Database: `admin`
+   - Database: `mydatabase`
 
-- `mongodb://` - Protocol
-- `admin:password` - Username and password defined in docker-compose.yml
-- `localhost:27017` - Host and port
-- `mydatabase` - Default database name
-- `authSource=admin` - Database containing the user credentials
+4. Click "Connect"
 
-## Managing MongoDB
+5. Once connected, you can:
+   - Browse the database structure
+   - Create, view and modify collections
+   - Execute queries
+   - Import and export data
 
-### Basic Docker Commands
+### Using Command Line
 
-- Stop the container:
-  ```bash
-  docker compose down
-  ```
-
-- Stop and remove volumes (deletes all data):
-  ```bash
-  docker compose down -v
-  ```
-
-- View container logs:
-  ```bash
-  docker logs mongodb
-  ```
-
-- Access MongoDB shell in the container:
-  ```bash
-  docker exec -it mongodb mongosh -u admin -p password
-  ```
-
-### MongoDB Compass Features
-
-Once connected with MongoDB Compass, you can:
-
-- Create and manage databases
-- Create and manage collections
-- Insert, update, and delete documents
-- Run queries with the query builder
-- Analyze data with visualizations
-- Import and export data
-
-## Customization Options
-
-### Modifying MongoDB Configuration
-
-To customize MongoDB settings, you can:
-
-1. Create a custom `mongod.conf` file
-2. Mount it to the container by adding to the volumes section:
-
-```yaml
-volumes:
-  - ./mongod.conf:/etc/mongod.conf
-  - mongodb_data:/data/db
+```bash
+docker exec -it mongodb mongosh -u admin -p password
 ```
 
-3. Add a command to use this configuration:
+## Stopping the Container
 
-```yaml
-command: mongod --config /etc/mongod.conf
+```bash
+docker compose down
 ```
 
-### Initialization Scripts
+To remove volumes and delete all data:
 
-To run scripts when the container first starts:
-
-1. Create a directory for scripts:
-   ```bash
-   mkdir -p init-scripts
-   ```
-
-2. Add JavaScript or shell scripts to this directory
-3. Mount the directory in docker-compose.yml:
-
-```yaml
-volumes:
-  - ./init-scripts:/docker-entrypoint-initdb.d/
-  - mongodb_data:/data/db
+```bash
+docker compose down -v
 ```
 
 ## Troubleshooting
 
-### Common Issues
-
-1. **Can't connect to MongoDB**
-   - Check if the container is running: `docker ps`
-   - Verify port mapping: `docker port mongodb`
-   - Test connection locally: `docker exec -it mongodb mongosh -u admin -p password`
-
-2. **Authentication failed**
-   - Verify the credentials in docker-compose.yml
-   - Check if the authSource is correctly specified in the connection string
-
-3. **Data persistence issues**
-   - Ensure the volume is properly configured
-   - Check volume permissions: `docker volume inspect mongodb_data`
-
-## Security Notes
-
-- Change the default username and password in production environments
-- Consider using Docker secrets or environment files for credentials
-- Limit network exposure by binding to specific network interfaces
-- Implement MongoDB authentication and authorization mechanisms
-
-## Further Reading
-
-- [MongoDB Documentation](https://docs.mongodb.com/)
-- [Docker Documentation](https://docs.docker.com/)
-- [MongoDB Compass Documentation](https://docs.mongodb.com/compass/current/)
+If you can't connect to MongoDB:
+- Check if the container is running: `docker ps`
+- View container logs: `docker logs mongodb`
